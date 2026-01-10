@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PersonList from './components/PersonList';
 import AddPersonModal from './components/AddPersonModal';
+import PersonDetailModal from './components/PersonDetailModal';
 import { API_URL } from './config';
 import './App.css';
 
@@ -10,6 +11,7 @@ function App() {
   const [checking, setChecking] = useState(false);
   const [checkResults, setCheckResults] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const [error, setError] = useState('');
 
   // Fetch people on mount
@@ -132,6 +134,7 @@ function App() {
         <PersonList 
           people={people} 
           onDelete={handleDeletePerson}
+          onPersonClick={setSelectedPerson}
           loading={loading}
         />
       </main>
@@ -140,6 +143,13 @@ function App() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onPersonAdded={handlePersonAdded}
+      />
+
+      <PersonDetailModal
+        person={selectedPerson}
+        isOpen={selectedPerson !== null}
+        onClose={() => setSelectedPerson(null)}
+        onDelete={handleDeletePerson}
       />
     </div>
   );

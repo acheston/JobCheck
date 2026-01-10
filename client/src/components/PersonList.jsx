@@ -1,7 +1,7 @@
 import PersonCard from './PersonCard';
 import './PersonList.css';
 
-function PersonList({ people, onDelete, loading }) {
+function PersonList({ people, onDelete, onPersonClick, loading }) {
   if (loading) {
     return (
       <div className="person-list-empty">
@@ -27,6 +27,7 @@ function PersonList({ people, onDelete, loading }) {
           key={person.id} 
           person={person} 
           onDelete={onDelete}
+          onClick={() => onPersonClick(person)}
         />
       ))}
     </div>
