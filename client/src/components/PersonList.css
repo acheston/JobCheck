@@ -1,0 +1,26 @@
+.person-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.person-list-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b6b8a;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.person-list-empty h3 {
+  margin: 0 0 0.5rem 0;
+  color: #4a4a68;
+}
+
+.person-list-empty p {
+  margin: 0;
+  font-size: 0.95rem;
+}

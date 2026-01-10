@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build output
+client/dist/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.production
+server/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local data (contains personal info)
+server/data/people.json
+server/public/images/
+
+# Vercel
+.vercel

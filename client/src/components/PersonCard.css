@@ -1,0 +1,147 @@
+.person-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+}
+
+.person-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.person-image {
+  flex-shrink: 0;
+}
+
+.person-image img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.placeholder-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.person-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.person-name {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.person-role {
+  margin: 0 0 0.125rem 0;
+  color: #4a4a68;
+  font-size: 0.95rem;
+}
+
+.person-company {
+  margin: 0 0 0.25rem 0;
+  color: #6b6b8a;
+  font-size: 0.875rem;
+}
+
+.history-toggle {
+  margin: 0.25rem 0 0 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.history-toggle:hover {
+  text-decoration: underline;
+}
+
+.person-card.has-history {
+  border-left: 3px solid #667eea;
+}
+
+.job-history {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #e5e5ea;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.375rem 0;
+  font-size: 0.8rem;
+}
+
+.history-item:not(:last-child) {
+  border-bottom: 1px solid #f0f0f2;
+}
+
+.history-role {
+  color: #4a4a68;
+  font-weight: 500;
+}
+
+.history-company {
+  color: #6b6b8a;
+}
+
+.history-dates {
+  color: #9999aa;
+  font-size: 0.75rem;
+}
+
+.person-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.last-checked {
+  margin: 0;
+  color: #9999aa;
+  font-size: 0.75rem;
+}
+
+.delete-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #f5f5f7;
+  color: #999;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #fee;
+  color: #e55;
+}
