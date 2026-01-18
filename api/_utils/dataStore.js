@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { query, queryOne, queryMany } from '../../../db/client.js';
+import { query, queryOne, queryMany } from '../../db/client.js';
 
 /**
  * Format date as DD/MM/YYYY
