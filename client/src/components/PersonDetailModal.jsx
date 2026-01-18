@@ -1,4 +1,5 @@
 import { SERVER_URL } from '../config';
+import Avatar from './Avatar';
 import './PersonDetailModal.css';
 
 function getImageUrl(imageUrl) {
@@ -30,13 +31,7 @@ function PersonDetailModal({ person, isOpen, onClose, onDelete }) {
         
         <div className="detail-header">
           <div className="detail-image">
-            {fullImageUrl ? (
-              <img src={fullImageUrl} alt={name} />
-            ) : (
-              <div className="placeholder-image">
-                {name.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <Avatar name={name} imageUrl={fullImageUrl} size={100} />
           </div>
           
           <div className="detail-title">

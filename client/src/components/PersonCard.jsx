@@ -1,4 +1,5 @@
 import { SERVER_URL } from '../config';
+import Avatar from './Avatar';
 import './PersonCard.css';
 
 // Convert image URL to full URL if it's a local path
@@ -23,13 +24,7 @@ function PersonCard({ person, onDelete, onClick }) {
   return (
     <div className={`person-card ${hasHistory ? 'has-history' : ''}`} onClick={onClick}>
       <div className="person-image">
-        {fullImageUrl ? (
-          <img src={fullImageUrl} alt={name} />
-        ) : (
-          <div className="placeholder-image">
-            {name.charAt(0).toUpperCase()}
-          </div>
-        )}
+        <Avatar name={name} imageUrl={fullImageUrl} size={64} />
       </div>
       
       <div className="person-info">

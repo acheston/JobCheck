@@ -19,24 +19,15 @@
   flex-shrink: 0;
 }
 
-.person-image img {
+.person-image .avatar-container {
+  position: relative;
+}
+
+.person-image .avatar-container img {
   width: 64px;
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
-}
-
-.placeholder-image {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: 600;
 }
 
 .person-info {

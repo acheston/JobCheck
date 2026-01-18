@@ -83,10 +83,42 @@ function parseSearchResults(textData, imageData, name, company) {
     }
   }
 
-  if (imageData && imageData.images) {
-    result.imageCandidates = getImageCandidates(imageData.images);
-    if (result.imageCandidates.length > 0 && !result.imageUrl) {
-      result.imageUrl = result.imageCandidates[0].url;
+  // Generate avatar and include it as the first option
+  const avatarUrl = generateAvatar(name, 400); // Generate larger size for image picker
+  const avatarCandidate = {
+    url: avatarUrl,
+    thumbnailUrl: avatarUrl,
+    source: 'Generated Avatar',
+    width: 400,
+    height: 400
+  };
+  
+  // Get profile image candidates from image search results
+  if (imageData && imageData.images && imageData.images.length > 0) {
+    const serperCandidates = imageData.images.slice(0, 11).map(img => ({
+      url: img.imageUrl,
+      thumbnailUrl: img.thumbnailUrl,
+      source: img.domain,
+      width: img.imageWidth,
+      height: img.imageHeight
+    }));
+    
+    // Put avatar first, then Serper images
+    result.imageCandidates = [avatarCandidate, ...serperCandidates];
+    
+    // Find the first image that looks like a profile photo
+    const validImage = imageData.images.find(img => isValidProfileImage(img));
+    if (validImage && !result.imageUrl) {
+      result.imageUrl = validImage.imageUrl;
+    } else if (!result.imageUrl) {
+      // If no valid image found, use avatar as default
+      result.imageUrl = avatarUrl;
+    }
+  } else {
+    // No images from Serper, use avatar
+    result.imageCandidates = [avatarCandidate];
+    if (!result.imageUrl) {
+      result.imageUrl = avatarUrl;
     }
   }
 
@@ -139,41 +171,108 @@ function parseLinkedInTitle(title, name) {
   return null;
 }
 
-function getImageCandidates(images) {
-  if (!images || images.length === 0) return [];
-
-  const prioritySources = ['theorg.com', 'linkedin.com', 'zoominfo.com', 'rocketreach.co'];
+/**
+ * Generate an SVG avatar with person's initials (backend version)
+ * @param {string} name - Person's full name
+ * @param {number} size - Avatar size in pixels
+ * @returns {string} SVG data URL
+ */
+function generateAvatar(name, size = 400) {
+  const initials = getInitialsFromName(name);
+  const colors = getColorForNameBackend(name);
   
-  const scored = images.map(img => {
-    let score = 0;
-    const aspectRatio = img.imageWidth / img.imageHeight;
-    
-    if (aspectRatio >= 0.8 && aspectRatio <= 1.2) score += 50;
-    
-    for (let i = 0; i < prioritySources.length; i++) {
-      if (img.domain && img.domain.includes(prioritySources[i])) {
-        score += 30 - (i * 5);
-        break;
-      }
-    }
-    
-    if (img.imageWidth >= 200 && img.imageWidth <= 1000) score += 20;
-    if (img.imageWidth >= 400) score += 10;
-    
-    return {
-      url: img.imageUrl,
-      thumbnailUrl: img.thumbnailUrl,
-      source: img.domain,
-      width: img.imageWidth,
-      height: img.imageHeight,
-      score
-    };
-  });
+  const svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><rect width="${size}" height="${size}" fill="${colors.background}"/><text x="50%" y="50%" font-family="Arial, sans-serif" font-size="${size * 0.4}" font-weight="600" fill="${colors.text}" text-anchor="middle" dominant-baseline="central">${initials}</text></svg>`;
+  
+  // Use Buffer for base64 encoding in Node.js (instead of btoa)
+  const base64 = Buffer.from(svg).toString('base64');
+  return `data:image/svg+xml;base64,${base64}`;
+}
 
-  return scored
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 12)
-    .map(({ score, ...rest }) => rest);
+/**
+ * Extract initials from a person's name
+ * @param {string} name - Full name
+ * @returns {string} Initials (1-2 characters)
+ */
+function getInitialsFromName(name) {
+  if (!name) return '?';
+  
+  const parts = name.trim().split(/\s+/);
+  
+  if (parts.length === 1) {
+    return parts[0].charAt(0).toUpperCase();
+  }
+  
+  const first = parts[0].charAt(0).toUpperCase();
+  const last = parts[parts.length - 1].charAt(0).toUpperCase();
+  
+  return first + last;
+}
+
+/**
+ * Generate consistent colors for a name (deterministic)
+ * @param {string} name - Person's name
+ * @returns {Object} Object with background and text color
+ */
+function getColorForNameBackend(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  
+  const hue = Math.abs(hash % 360);
+  const saturation = 45 + (Math.abs(hash) % 20);
+  const lightness = 55 + (Math.abs(hash) % 15);
+  
+  const background = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  const text = '#ffffff';
+  
+  return { background, text };
+}
+
+/**
+ * Validate if an image is likely a profile photo (not a document/screenshot)
+ * @param {Object} img - Image object from Serper API
+ * @returns {boolean} True if image appears to be a profile photo
+ */
+function isValidProfileImage(img) {
+  const sourceUrl = (img.link || img.domain || '').toLowerCase();
+  const imageUrl = (img.imageUrl || '').toLowerCase();
+  
+  // Skip if URL suggests it's a document or webpage
+  const documentIndicators = [
+    'pdf', 'document', 'screenshot', 'page', 'article',
+    'newsletter', 'alert', 'coverage', 'insurance', 'trade'
+  ];
+  
+  const fullUrl = (sourceUrl + ' ' + imageUrl).toLowerCase();
+  for (const indicator of documentIndicators) {
+    if (fullUrl.includes(indicator)) {
+      return false;
+    }
+  }
+  
+  // Prefer images from professional sources
+  const professionalSources = [
+    'linkedin.com', 'crunchbase.com', 'twitter.com', 'github.com',
+    'theorg.com', 'zoominfo.com', 'rocketreach.co', 'bloomberg.com'
+  ];
+  
+  const isFromProfessionalSource = professionalSources.some(source => 
+    sourceUrl.includes(source)
+  );
+  
+  // Check image dimensions - profile photos are usually square-ish
+  const width = img.imageWidth || 0;
+  const height = img.imageHeight || 0;
+  if (width === 0 || height === 0) return false;
+  
+  const aspectRatio = width / height;
+  const isSquareish = aspectRatio >= 0.7 && aspectRatio <= 1.4;
+  
+  // Valid if: from professional source OR (square-ish and reasonable size)
+  const hasGoodSize = width >= 150 && width <= 2000 && height >= 150 && height <= 2000;
+  
+  return isFromProfessionalSource || (isSquareish && hasGoodSize);
 }
 
 export async function downloadImage(imageUrl, name) {
