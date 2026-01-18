@@ -37,7 +37,12 @@ function getPool() {
     // Handle pool errors
     pool.on('error', (err) => {
       console.error('Unexpected error on idle client', err);
-      process.exit(-1);
+      // Don't exit in serverless environments
+      if (process.env.VERCEL) {
+        console.error('Pool error in Vercel - will attempt to reconnect on next query');
+      } else {
+        process.exit(-1);
+      }
     });
   }
   

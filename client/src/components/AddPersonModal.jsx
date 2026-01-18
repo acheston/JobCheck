@@ -86,14 +86,18 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add person');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || 'Failed to add person';
+        console.error('Server error response:', response.status, errorData);
+        throw new Error(errorMessage);
       }
 
       const newPerson = await response.json();
       onPersonAdded(newPerson);
       handleClose();
     } catch (err) {
-      setError('Failed to add person. Please try again.');
+      const errorMessage = err.message || 'Failed to add person. Please try again.';
+      setError(errorMessage);
       console.error('Add person error:', err);
     } finally {
       setLoading(false);

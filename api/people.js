@@ -46,6 +46,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (error) {
     console.error('API error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Error stack:', error.stack);
+    // Send more detailed error in development/debugging
+    const errorMessage = process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : `Error: ${error.message}`;
+    return res.status(500).json({ error: errorMessage, details: error.message });
   }
 }

@@ -68,7 +68,12 @@ router.post('/', async (req, res) => {
     res.status(201).json(person);
   } catch (error) {
     console.error('Error adding person:', error);
-    res.status(500).json({ error: 'Failed to add person' });
+    console.error('Error stack:', error.stack);
+    // Send more detailed error in development
+    const errorMessage = process.env.NODE_ENV === 'development' 
+      ? `Failed to add person: ${error.message}` 
+      : 'Failed to add person';
+    res.status(500).json({ error: errorMessage });
   }
 });
 
