@@ -3,15 +3,18 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import peopleRoutes from './routes/people.js';
-import searchRoutes from './routes/search.js';
-import jobCheckRoutes from './routes/jobCheck.js';
-import { startScheduler } from './services/jobChecker.js';
+
+// Load environment variables FIRST before any other imports
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config();
+// Import routes after dotenv.config() so database client can read env vars
+import peopleRoutes from './routes/people.js';
+import searchRoutes from './routes/search.js';
+import jobCheckRoutes from './routes/jobCheck.js';
+import { startScheduler } from './services/jobChecker.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;

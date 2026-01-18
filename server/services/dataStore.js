@@ -1,21 +1,42 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const DATA_FILE = path.join(__dirname, '..', 'data', 'people.json');
+import { query, queryOne, queryMany } from '../../db/client.js';
 
 /**
- * Read all people from the JSON file
+ * Format date as DD/MM/YYYY
+ * @param {Date} date 
+ * @returns {string}
+ */
+function formatDate(date) {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+/**
+ * Convert database row to person object format
+ */
+function rowToPerson(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    imageUrl: row.image_url,
+    lastChecked: row.last_checked,
+    currentJob: row.current_job,
+    jobHistory: row.job_history || []
+  };
+}
+
+/**
+ * Read all people from the database
  * @returns {Promise<Array>} Array of people objects
  */
 export async function getAllPeople() {
   try {
-    const data = await fs.readFile(DATA_FILE, 'utf-8');
-    const parsed = JSON.parse(data);
-    return parsed.people || [];
+    const rows = await queryMany(
+      'SELECT * FROM people ORDER BY created_at DESC'
+    );
+    return rows.map(rowToPerson);
   } catch (error) {
     console.error('Error reading people data:', error);
     return [];
@@ -28,8 +49,16 @@ export async function getAllPeople() {
  * @returns {Promise<Object|null>} Person object or null
  */
 export async function getPersonById(id) {
-  const people = await getAllPeople();
-  return people.find(p => p.id === id) || null;
+  try {
+    const row = await queryOne(
+      'SELECT * FROM people WHERE id = $1',
+      [id]
+    );
+    return row ? rowToPerson(row) : null;
+  } catch (error) {
+    console.error('Error getting person by ID:', error);
+    return null;
+  }
 }
 
 /**
@@ -38,25 +67,34 @@ export async function getPersonById(id) {
  * @returns {Promise<Object>} The created person object
  */
 export async function addPerson(personData) {
-  const people = await getAllPeople();
-  
-  const newPerson = {
-    id: uuidv4(),
-    name: personData.name,
-    imageUrl: personData.imageUrl || null,
-    lastChecked: formatDate(new Date()),
-    currentJob: {
-      company: personData.company,
-      role: personData.role || 'Unknown',
-      startDate: formatDate(new Date())
-    },
-    jobHistory: []
+  const id = uuidv4();
+  const lastChecked = formatDate(new Date());
+  const currentJob = {
+    company: personData.company,
+    role: personData.role || 'Unknown',
+    startDate: lastChecked
   };
+  const jobHistory = [];
 
-  people.push(newPerson);
-  await savePeople(people);
-  
-  return newPerson;
+  try {
+    await query(
+      `INSERT INTO people (id, name, image_url, last_checked, current_job, job_history)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [id, personData.name, personData.imageUrl || null, lastChecked, JSON.stringify(currentJob), JSON.stringify(jobHistory)]
+    );
+
+    return {
+      id,
+      name: personData.name,
+      imageUrl: personData.imageUrl || null,
+      lastChecked,
+      currentJob,
+      jobHistory
+    };
+  } catch (error) {
+    console.error('Error adding person:', error);
+    throw error;
+  }
 }
 
 /**
@@ -66,31 +104,50 @@ export async function addPerson(personData) {
  * @returns {Promise<Object|null>} Updated person or null if not found
  */
 export async function updatePerson(id, updates) {
-  const people = await getAllPeople();
-  const index = people.findIndex(p => p.id === id);
-  
-  if (index === -1) return null;
+  try {
+    // Get current person
+    const current = await getPersonById(id);
+    if (!current) return null;
 
-  // If job has changed, move current job to history
-  if (updates.currentJob && 
-      (updates.currentJob.company !== people[index].currentJob.company ||
-       updates.currentJob.role !== people[index].currentJob.role)) {
-    
-    const oldJob = {
-      ...people[index].currentJob,
-      endDate: formatDate(new Date())
-    };
-    people[index].jobHistory.unshift(oldJob);
+    // Build update object
+    const updatedPerson = { ...current, ...updates };
+    const lastChecked = formatDate(new Date());
+
+    // If job has changed, move current job to history
+    if (updates.currentJob && 
+        (updates.currentJob.company !== current.currentJob?.company ||
+         updates.currentJob.role !== current.currentJob?.role)) {
+      
+      const oldJob = {
+        ...current.currentJob,
+        endDate: lastChecked
+      };
+      updatedPerson.jobHistory = [oldJob, ...(current.jobHistory || [])];
+    }
+
+    updatedPerson.lastChecked = lastChecked;
+
+    // Update database
+    await query(
+      `UPDATE people 
+       SET name = $1, image_url = $2, last_checked = $3, 
+           current_job = $4, job_history = $5, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $6`,
+      [
+        updatedPerson.name,
+        updatedPerson.imageUrl,
+        updatedPerson.lastChecked,
+        JSON.stringify(updatedPerson.currentJob),
+        JSON.stringify(updatedPerson.jobHistory || []),
+        id
+      ]
+    );
+
+    return updatedPerson;
+  } catch (error) {
+    console.error('Error updating person:', error);
+    return null;
   }
-
-  people[index] = {
-    ...people[index],
-    ...updates,
-    lastChecked: formatDate(new Date())
-  };
-
-  await savePeople(people);
-  return people[index];
 }
 
 /**
@@ -99,36 +156,16 @@ export async function updatePerson(id, updates) {
  * @returns {Promise<boolean>} True if deleted, false if not found
  */
 export async function deletePerson(id) {
-  const people = await getAllPeople();
-  const index = people.findIndex(p => p.id === id);
-  
-  if (index === -1) return false;
-
-  people.splice(index, 1);
-  await savePeople(people);
-  
-  return true;
-}
-
-/**
- * Save people array to JSON file
- * @param {Array} people - Array of people objects
- */
-async function savePeople(people) {
-  const data = JSON.stringify({ people }, null, 2);
-  await fs.writeFile(DATA_FILE, data, 'utf-8');
-}
-
-/**
- * Format date as DD/MM/YYYY
- * @param {Date} date 
- * @returns {string}
- */
-function formatDate(date) {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+  try {
+    const result = await query(
+      'DELETE FROM people WHERE id = $1',
+      [id]
+    );
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error('Error deleting person:', error);
+    return false;
+  }
 }
 
 export default {

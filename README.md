@@ -1,82 +1,108 @@
-# JobCheck
+# JobCheck - Job Change Monitoring App
 
-A web application that monitors people for job changes. Track your professional network and get notified when someone changes roles.
+Monitor job changes for people in your network with automated weekly checks and alerts.
 
-## Quick Start
+## Features
+
+- 🔍 Search and add people to monitor using Serper API
+- 📸 Automatic profile image detection with avatar fallback
+- 📅 Weekly automated job change detection
+- 📊 Job history tracking
+- 🎨 Beautiful, modern UI with React
+
+## Tech Stack
+
+- **Frontend**: React, Vite
+- **Backend**: Node.js, Express (local dev) / Vercel Serverless (production)
+- **Database**: Neon PostgreSQL
+- **APIs**: Serper Search API
+
+## Setup
 
 ### Prerequisites
 
 - Node.js 18+
-- A Serper API key (get one at https://serper.dev)
+- PostgreSQL database (Neon recommended)
 
-### Setup
+### Installation
 
-1. **Clone and install dependencies**
+1. Clone the repository:
+```bash
+git clone https://github.com/acheston/JobCheck.git
+cd JobCheck
+```
 
-   ```bash
-   # Install backend dependencies
-   cd server
-   npm install
+2. Install dependencies:
 
-   # Install frontend dependencies
-   cd ../client
-   npm install
-   ```
+```bash
+# Backend dependencies
+cd server && npm install
 
-2. **Configure your API key**
+# Frontend dependencies
+cd ../client && npm install
+```
 
-   Create a `.env` file in the `server` directory:
+3. Set up environment variables:
 
-   ```
-   SERPER_API_KEY=your_api_key_here
-   ```
+Create `server/.env`:
+```env
+SERPER_API_KEY=your_serper_api_key
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+```
 
-3. **Start the application**
+For Vercel deployment, add these as environment variables in the Vercel dashboard.
 
-   Open two terminal windows:
+4. Initialize the database:
 
-   ```bash
-   # Terminal 1: Start the backend
-   cd server
-   npm run dev
-   ```
+```bash
+# Make sure DATABASE_URL is set in your environment
+DATABASE_URL=your_database_url node db/init.js
+```
 
-   ```bash
-   # Terminal 2: Start the frontend
-   cd client
-   npm run dev
-   ```
+5. Start the development servers:
 
-4. **Open the app**
+```bash
+# Terminal 1 - Backend
+cd server && npm run dev
 
-   Navigate to http://localhost:5173
+# Terminal 2 - Frontend
+cd client && npm run dev
+```
 
-## Usage
+The app will be available at `http://localhost:5173`
 
-1. Click **"Add Person"** to start monitoring someone
-2. Enter their name and current company
-3. Click **"Next"** to search for their information
-4. Review the results and click **"Add to List"**
-5. The person will now appear in your monitoring list
+## Database Setup
+
+The app uses Neon PostgreSQL. To set up:
+
+1. Create a Neon database at [neon.tech](https://neon.tech)
+2. Copy your connection string (DATABASE_URL)
+3. Add it to your `.env` file
+4. Run the initialization script: `node db/init.js`
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import the project in Vercel
+3. Add environment variables in Vercel:
+   - `SERPER_API_KEY`
+   - `DATABASE_URL` (or `POSTGRES_URL`)
+4. Deploy!
+
+The Vercel deployment uses serverless functions in the `/api` directory.
 
 ## Project Structure
 
 ```
 JobCheck/
-├── client/          # React frontend
-├── server/          # Node.js backend
-├── REQUIREMENTS.md  # Detailed requirements & docs
-└── README.md        # This file
+├── api/              # Vercel serverless functions
+├── client/           # React frontend
+├── server/           # Express backend (local dev)
+├── db/               # Database schema and utilities
+└── README.md
 ```
-
-See [REQUIREMENTS.md](./REQUIREMENTS.md) for detailed documentation.
-
-## Tech Stack
-
-- **Frontend**: React + Vite
-- **Backend**: Node.js + Express
-- **Data**: JSON file storage
-- **API**: Serper (Google Search API)
 
 ## License
 

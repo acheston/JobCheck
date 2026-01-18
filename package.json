@@ -1,0 +1,17 @@
+{
+  "name": "jobcheck",
+  "version": "1.0.0",
+  "description": "JobCheck - Job Change Monitoring App",
+  "type": "module",
+  "scripts": {
+    "db:init": "node db/init.js"
+  },
+  "dependencies": {
+    "pg": "^8.11.3",
+    "uuid": "^11.0.4"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18"
+  }
+}
