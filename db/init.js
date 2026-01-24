@@ -2,6 +2,8 @@
  * Database initialization script
  * Run this once to set up the database schema
  * Usage: node db/init.js
+ * 
+ * This script will load .env from the server directory if DATABASE_URL is not set
  */
 
 import pkg from 'pg';
@@ -12,6 +14,27 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Try to load .env from server directory if DATABASE_URL is not set
+if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) {
+  const serverEnvPath = path.join(__dirname, '../server/.env');
+  if (fs.existsSync(serverEnvPath)) {
+    const envContent = fs.readFileSync(serverEnvPath, 'utf-8');
+    const envLines = envContent.split('\n');
+    for (const line of envLines) {
+      const trimmed = line.trim();
+      if (trimmed && !trimmed.startsWith('#')) {
+        const [key, ...valueParts] = trimmed.split('=');
+        if (key && valueParts.length > 0) {
+          const value = valueParts.join('=').trim();
+          if (!process.env[key]) {
+            process.env[key] = value;
+          }
+        }
+      }
+    }
+  }
+}
 
 const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 

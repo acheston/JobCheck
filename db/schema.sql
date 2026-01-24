@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS people (
   last_checked VARCHAR(20) NOT NULL,
   current_job JSONB NOT NULL,
   job_history JSONB DEFAULT '[]'::jsonb,
+  email_recipients TEXT[] DEFAULT ARRAY[]::TEXT[],
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

@@ -23,7 +23,8 @@ function rowToPerson(row) {
     imageUrl: row.image_url,
     lastChecked: row.last_checked,
     currentJob: row.current_job,
-    jobHistory: row.job_history || []
+    jobHistory: row.job_history || [],
+    emailRecipients: row.email_recipients || []
   };
 }
 
@@ -75,12 +76,25 @@ export async function addPerson(personData) {
     startDate: lastChecked
   };
   const jobHistory = [];
+  
+  // Parse email recipients from comma-separated string or array
+  let emailRecipients = [];
+  if (personData.emailRecipients) {
+    if (Array.isArray(personData.emailRecipients)) {
+      emailRecipients = personData.emailRecipients.filter(email => email && email.trim().includes('@'));
+    } else if (typeof personData.emailRecipients === 'string') {
+      emailRecipients = personData.emailRecipients
+        .split(',')
+        .map(email => email.trim())
+        .filter(email => email && email.includes('@'));
+    }
+  }
 
   try {
     await query(
-      `INSERT INTO people (id, name, image_url, last_checked, current_job, job_history)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [id, personData.name, personData.imageUrl || null, lastChecked, JSON.stringify(currentJob), JSON.stringify(jobHistory)]
+      `INSERT INTO people (id, name, image_url, last_checked, current_job, job_history, email_recipients)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [id, personData.name, personData.imageUrl || null, lastChecked, JSON.stringify(currentJob), JSON.stringify(jobHistory), emailRecipients]
     );
 
     return {
@@ -89,7 +103,8 @@ export async function addPerson(personData) {
       imageUrl: personData.imageUrl || null,
       lastChecked,
       currentJob,
-      jobHistory
+      jobHistory,
+      emailRecipients
     };
   } catch (error) {
     console.error('Error adding person:', error);
@@ -127,18 +142,33 @@ export async function updatePerson(id, updates) {
 
     updatedPerson.lastChecked = lastChecked;
 
+    // Handle email recipients update if provided
+    if (updates.emailRecipients !== undefined) {
+      let emailRecipients = [];
+      if (Array.isArray(updates.emailRecipients)) {
+        emailRecipients = updates.emailRecipients.filter(email => email && email.trim().includes('@'));
+      } else if (typeof updates.emailRecipients === 'string') {
+        emailRecipients = updates.emailRecipients
+          .split(',')
+          .map(email => email.trim())
+          .filter(email => email && email.includes('@'));
+      }
+      updatedPerson.emailRecipients = emailRecipients;
+    }
+
     // Update database
     await query(
       `UPDATE people 
        SET name = $1, image_url = $2, last_checked = $3, 
-           current_job = $4, job_history = $5, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $6`,
+           current_job = $4, job_history = $5, email_recipients = $6, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $7`,
       [
         updatedPerson.name,
         updatedPerson.imageUrl,
         updatedPerson.lastChecked,
         JSON.stringify(updatedPerson.currentJob),
         JSON.stringify(updatedPerson.jobHistory || []),
+        updatedPerson.emailRecipients || [],
         id
       ]
     );

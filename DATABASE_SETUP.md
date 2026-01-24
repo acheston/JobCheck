@@ -82,4 +82,6 @@ The `CREATE TABLE IF NOT EXISTS` statement prevents errors if the schema already
 - **Local dev**: Uses `server/.env`
 - **Vercel**: Uses environment variables from the dashboard
 
-Both should point to the same Neon database for consistency.
+⚠️ **Important**: For separate dev and production databases, see [DEV_PRODUCTION_DB_SETUP.md](./DEV_PRODUCTION_DB_SETUP.md)
+
+This prevents test data from appearing in your production app.

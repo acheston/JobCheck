@@ -18,6 +18,7 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
   const [searchResults, setSearchResults] = useState(null);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [emailRecipients, setEmailRecipients] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -28,6 +29,7 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
     setSearchResults(null);
     setSelectedImageUrl(null);
     setShowImagePicker(false);
+    setEmailRecipients('');
     setLoading(false);
     setError('');
   };
@@ -69,6 +71,10 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
     }
   };
 
+  const handleNextFromSearch = () => {
+    setStep(3);
+  };
+
   const handleAddPerson = async () => {
     setLoading(true);
     setError('');
@@ -81,7 +87,8 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
           name: searchResults.name,
           company: searchResults.company,
           role: searchResults.role,
-          imageUrl: selectedImageUrl
+          imageUrl: selectedImageUrl,
+          emailRecipients: emailRecipients.trim()
         })
       });
 
@@ -131,7 +138,9 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
         <button className="modal-close" onClick={handleClose}>×</button>
         
         <h2 className="modal-title">
-          {step === 1 ? 'Add Person to Monitor' : 'Confirm Person Details'}
+          {step === 1 ? 'Add Person to Monitor' : 
+           step === 2 ? 'Confirm Person Details' : 
+           'Email Alert Recipients'}
         </h2>
 
         {error && <div className="modal-error">{error}</div>}
@@ -172,7 +181,7 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
               </button>
             </div>
           </div>
-        ) : (
+        ) : step === 2 ? (
           <div className="modal-step">
             {showImagePicker ? (
               <div className="image-picker">
@@ -260,8 +269,44 @@ function AddPersonModal({ isOpen, onClose, onPersonAdded }) {
               </button>
               <button 
                 className="btn btn-primary" 
-                onClick={handleAddPerson}
+                onClick={handleNextFromSearch}
                 disabled={loading || showImagePicker}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="modal-step">
+            <div className="form-group">
+              <label htmlFor="emailRecipients">
+                Email Alert Recipients <span className="optional">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="emailRecipients"
+                value={emailRecipients}
+                onChange={e => setEmailRecipients(e.target.value)}
+                placeholder="email1@example.com, email2@example.com"
+                disabled={loading}
+              />
+              <small className="form-hint">
+                Enter email addresses separated by commas. These recipients will receive alerts when job changes are detected for this person.
+              </small>
+            </div>
+
+            <div className="modal-actions">
+              <button 
+                className="btn btn-secondary" 
+                onClick={() => setStep(2)}
+                disabled={loading}
+              >
+                Back
+              </button>
+              <button 
+                className="btn btn-primary" 
+                onClick={handleAddPerson}
+                disabled={loading}
               >
                 {loading ? 'Adding...' : 'Add to List'}
               </button>

@@ -49,7 +49,7 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { name, company, role, imageUrl } = req.body;
+    const { name, company, role, imageUrl, emailRecipients } = req.body;
     
     if (!name || !company) {
       return res.status(400).json({ error: 'Name and company are required' });
@@ -64,7 +64,7 @@ router.post('/', async (req, res) => {
       }
     }
 
-    const person = await addPerson({ name, company, role, imageUrl: localImageUrl });
+    const person = await addPerson({ name, company, role, imageUrl: localImageUrl, emailRecipients });
     res.status(201).json(person);
   } catch (error) {
     console.error('Error adding person:', error);

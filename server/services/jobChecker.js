@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { getAllPeople, updatePerson } from './dataStore.js';
 import { searchPerson } from './serper.js';
+import { sendJobChangeAlert } from './emailService.js';
 
 /**
  * Job Checker Service
@@ -269,6 +270,29 @@ async function checkPersonForChanges(person) {
       console.log(`[JobChecker] Job change detected for ${person.name} (confidence: ${analysis.confidence}%)`);
       console.log(`  Previous: ${person.currentJob?.role} at ${person.currentJob?.company}`);
       console.log(`  New: ${result.newRole} at ${result.newCompany}`);
+
+      // Send email alert for the job change
+      try {
+        const emailResult = await sendJobChangeAlert({
+          personName: person.name,
+          previousRole: person.currentJob?.role,
+          previousCompany: person.currentJob?.company,
+          newRole: result.newRole,
+          newCompany: result.newCompany,
+          confidence: analysis.confidence,
+          evidence: result.evidence,
+          recipients: person.emailRecipients || []
+        });
+
+        if (emailResult.success) {
+          console.log(`[JobChecker] Email alert sent successfully for ${person.name}`);
+        } else {
+          console.warn(`[JobChecker] Failed to send email alert for ${person.name}: ${emailResult.error}`);
+        }
+      } catch (emailError) {
+        // Don't fail the job check if email fails
+        console.error(`[JobChecker] Error sending email alert for ${person.name}:`, emailError.message);
+      }
     } else {
       // Just update the lastChecked date
       await updatePerson(person.id, {
