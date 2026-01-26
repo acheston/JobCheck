@@ -85,6 +85,13 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Error in test update:', error);
-    return res.status(500).json({ error: `Failed to update and notify: ${error.message}` });
+    console.error('Error stack:', error.stack);
+    
+    // Ensure we always return JSON, even on unexpected errors
+    const errorMessage = error.message || 'Unknown error occurred';
+    return res.status(500).json({ 
+      error: `Failed to update and notify: ${errorMessage}`,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }

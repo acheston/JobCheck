@@ -1,6 +1,12 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend with API key, or null if not configured
+const resendApiKey = process.env.RESEND_API_KEY;
+if (!resendApiKey) {
+  console.warn('[EmailService] RESEND_API_KEY not configured');
+}
+
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 /**
  * Email Service
@@ -45,6 +51,11 @@ async function sendJobChangeAlert(changeInfo) {
     recipients = getEmailRecipients();
   }
   
+  if (!resend) {
+    console.warn('[EmailService] Resend not initialized - RESEND_API_KEY missing');
+    return { success: false, error: 'Email service not configured - RESEND_API_KEY missing' };
+  }
+
   if (recipients.length === 0) {
     console.warn('[EmailService] No email recipients configured');
     return { success: false, error: 'No recipients configured' };

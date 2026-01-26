@@ -37,6 +37,13 @@ export default async function handler(req, res) {
     return res.status(201).json(person);
   } catch (error) {
     console.error('Error creating test person:', error);
-    return res.status(500).json({ error: `Failed to create test person: ${error.message}` });
+    console.error('Error stack:', error.stack);
+    
+    // Ensure we always return JSON, even on unexpected errors
+    const errorMessage = error.message || 'Unknown error occurred';
+    return res.status(500).json({ 
+      error: `Failed to create test person: ${errorMessage}`,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }
