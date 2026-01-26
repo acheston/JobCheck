@@ -1,0 +1,279 @@
+.notification-test-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.test-page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.test-page-header h1 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.test-page-header p {
+  color: #666;
+  margin: 0;
+}
+
+.test-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.test-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 25px;
+}
+
+.test-section h2 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1.5em;
+}
+
+.section-description {
+  color: #666;
+  margin: 0 0 20px 0;
+  font-size: 0.95em;
+}
+
+.test-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.form-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.form-group small {
+  color: #666;
+  font-size: 0.85em;
+}
+
+.test-button {
+  padding: 12px 24px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.test-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.test-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.trigger-button {
+  background-color: #ff5722;
+}
+
+.trigger-button:hover:not(:disabled) {
+  background-color: #e64a19;
+}
+
+.contact-display {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  margin-top: 15px;
+}
+
+.contact-info h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.contact-info p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.contact-info ul {
+  margin: 8px 0 0 20px;
+  padding: 0;
+}
+
+.contact-info li {
+  margin: 4px 0;
+  color: #666;
+}
+
+.clear-button {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.clear-button:hover {
+  background-color: #d32f2f;
+}
+
+.notification-result {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  margin-top: 15px;
+}
+
+.notification-result.success {
+  border-left: 4px solid #4CAF50;
+}
+
+.notification-result.error {
+  border-left: 4px solid #f44336;
+}
+
+.notification-result p {
+  margin: 8px 0;
+  color: #333;
+}
+
+.test-error {
+  background-color: #ffebee;
+  border: 1px solid #f44336;
+  border-radius: 4px;
+  padding: 15px;
+  color: #c62828;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.test-error button {
+  background: none;
+  border: none;
+  color: #c62828;
+  font-size: 1.5em;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.test-success {
+  background-color: #e8f5e9;
+  border: 1px solid #4CAF50;
+  border-radius: 4px;
+  padding: 15px;
+  color: #2e7d32;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.test-success button {
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-size: 1.5em;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.contact-item {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contact-item:hover {
+  border-color: #4CAF50;
+  background-color: #f1f8f4;
+}
+
+.contact-item.selected {
+  border-color: #4CAF50;
+  background-color: #e8f5e9;
+}
+
+.contact-item-info h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.contact-item-info p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 0.95em;
+}
+
+.contact-item-info small {
+  color: #999;
+  font-size: 0.85em;
+}
+
+.selected-badge {
+  background-color: #4CAF50;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.no-contacts {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-style: italic;
+}

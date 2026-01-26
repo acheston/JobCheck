@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import PersonList from './components/PersonList';
 import AddPersonModal from './components/AddPersonModal';
 import PersonDetailModal from './components/PersonDetailModal';
+import NotificationTestPage from './components/NotificationTestPage';
 import { API_URL } from './config';
 import './App.css';
 
 function App() {
+  const [currentView, setCurrentView] = useState('main'); // 'main' or 'test'
   const [people, setPeople] = useState([]);
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
@@ -82,6 +84,29 @@ function App() {
     }
   };
 
+  // Show test page if currentView is 'test'
+  if (currentView === 'test') {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <div className="header-content">
+            <h1>JobCheck</h1>
+            <p className="subtitle">Monitor job changes for your network</p>
+          </div>
+          <div className="header-actions">
+            <button 
+              className="add-button" 
+              onClick={() => setCurrentView('main')}
+            >
+              ← Back to Main
+            </button>
+          </div>
+        </header>
+        <NotificationTestPage />
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="app-header">
@@ -103,6 +128,13 @@ function App() {
             onClick={() => setIsModalOpen(true)}
           >
             + Add Person
+          </button>
+          <button 
+            className="test-button" 
+            onClick={() => setCurrentView('test')}
+            style={{ backgroundColor: '#2196F3', marginLeft: '10px' }}
+          >
+            🧪 Test Notifications
           </button>
         </div>
       </header>

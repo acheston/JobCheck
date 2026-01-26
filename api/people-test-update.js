@@ -1,38 +1,20 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { getPersonById, updatePerson } from './_utils/dataStore.js';
+import { sendJobChangeAlert } from './_utils/emailService.js';
 
-// Load environment variables FIRST before any other imports
-dotenv.config();
+export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'PUT, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-// Import routes after dotenv.config() so database client can read env vars
-import peopleRoutes from './routes/people.js';
-import searchRoutes from './routes/search.js';
-import jobCheckRoutes from './routes/jobCheck.js';
-import { startScheduler } from './services/jobChecker.js';
+  if (req.method !== 'PUT') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-const app = express();
-const PORT = process.env.PORT || 3001;
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Serve static images
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
-
-// Routes
-app.use('/api/people', peopleRoutes);
-app.use('/api/search', searchRoutes);
-app.use('/api/job-check', jobCheckRoutes);
-
-// Test update route (matches Vercel structure)
-app.put('/api/people-test-update', async (req, res) => {
   try {
     const { id } = req.query;
     const { newRole, newCompany, triggerNotification } = req.body;
@@ -44,9 +26,6 @@ app.put('/api/people-test-update', async (req, res) => {
     if (!triggerNotification) {
       return res.status(400).json({ error: 'This endpoint requires triggerNotification: true' });
     }
-
-    const { getPersonById, updatePerson } = await import('./services/dataStore.js');
-    const { sendJobChangeAlert } = await import('./services/emailService.js');
 
     // Get current person
     const currentPerson = await getPersonById(id);
@@ -88,7 +67,7 @@ app.put('/api/people-test-update', async (req, res) => {
         previousCompany: currentPerson.currentJob?.company,
         newRole: updatedPerson.currentJob?.role,
         newCompany: updatedPerson.currentJob?.company,
-        confidence: 100,
+        confidence: 100, // 100% confidence for manual test updates
         evidence: [],
         recipients: updatedPerson.emailRecipients || []
       });
@@ -108,16 +87,4 @@ app.put('/api/people-test-update', async (req, res) => {
     console.error('Error in test update:', error);
     return res.status(500).json({ error: `Failed to update and notify: ${error.message}` });
   }
-});
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  
-  // Start the weekly job checker scheduler
-  startScheduler();
-});
+}
