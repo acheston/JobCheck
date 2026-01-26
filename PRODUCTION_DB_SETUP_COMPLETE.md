@@ -16,7 +16,7 @@
 4. Find `DATABASE_URL` and click to edit it
 5. Update the value to your **production database**:
    ```
-   postgresql://neondb_owner:npg_5ZD8qKjNlJBR@ep-wandering-cloud-ahiuzsig-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+   postgresql://user:password@ep-production-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
    ```
 6. **Save** the changes
 

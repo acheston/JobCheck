@@ -28,7 +28,7 @@ You should see your `DATABASE_URL` variable. Check which environments it's set f
 3. **Keep checked** only "Production"
 4. Value should be your **production database**:
    ```
-   postgresql://neondb_owner:npg_hUJ6kfKZTut8@ep-young-queen-ahgnq1bm-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+   postgresql://user:password@ep-production-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
    ```
 
 **Option B: Separate Databases for Each Environment**

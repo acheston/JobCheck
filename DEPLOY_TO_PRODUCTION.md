@@ -23,7 +23,7 @@ Make sure the production database schema is created:
 
 ```bash
 cd /Users/ariccheston/.cursor/Projects/JobCheck
-DATABASE_URL=postgresql://neondb_owner:npg_3AxV6igtdYBk@ep-hidden-frost-ahjo8ydp-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require node db/init.js
+DATABASE_URL=your_production_connection_string node db/init.js
 ```
 
 ### Step 2: Verify Vercel Configuration
@@ -31,7 +31,7 @@ DATABASE_URL=postgresql://neondb_owner:npg_3AxV6igtdYBk@ep-hidden-frost-ahjo8ydp
 1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
 2. Verify `DATABASE_URL` is set to:
    ```
-   postgresql://neondb_owner:npg_3AxV6igtdYBk@ep-hidden-frost-ahjo8ydp-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+   postgresql://user:password@ep-production-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
    ```
 
 ### Step 3: Commit and Push

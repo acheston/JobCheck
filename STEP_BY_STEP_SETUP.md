@@ -12,7 +12,7 @@
 
 Your `server/.env` is already configured with:
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_Na94uXrdpSTj@ep-aged-pine-ah06q9tt-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql://dev_user:dev_password@ep-dev-instance-pooler.us-east-1.aws.neon.tech/dev_db?sslmode=require
 ```
 
 ### Step 1.3: Initialize Development Database

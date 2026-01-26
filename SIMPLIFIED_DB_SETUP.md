@@ -23,7 +23,7 @@ In Vercel Dashboard → Settings → Environment Variables:
 3. **Add it again** with:
    - **Value**: Your production database (old one)
      ```
-     postgresql://neondb_owner:npg_hUJ6kfKZTut8@ep-young-queen-ahgnq1bm-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+     postgresql://user:password@ep-production-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
      ```
    - **Environment**: Select "Production" only (or "All Environments" if that's the only option)
 
@@ -31,7 +31,7 @@ In Vercel Dashboard → Settings → Environment Variables:
 
 Your `server/.env` should have the development database (new one):
 ```
-DATABASE_URL=postgresql://neondb_owner:npg_Na94uXrdpSTj@ep-aged-pine-ah06q9tt-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql://dev_user:dev_password@ep-dev-instance-pooler.us-east-1.aws.neon.tech/dev_db?sslmode=require
 ```
 
 ## Step 3: Initialize Development Database

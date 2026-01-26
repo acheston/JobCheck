@@ -8,7 +8,7 @@
 4. Find `DATABASE_URL` and click to edit it (or delete and recreate if needed)
 5. Set the value to your new database:
    ```
-   postgresql://neondb_owner:npg_Na94uXrdpSTj@ep-aged-pine-ah06q9tt-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
+   postgresql://dev_user:dev_password@ep-dev-instance-pooler.us-east-1.aws.neon.tech/dev_db?sslmode=require
    ```
 6. Set it for **All Environments** (or Production if you can restrict it)
 7. **Save**
