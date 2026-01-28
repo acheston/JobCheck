@@ -57,8 +57,11 @@ async function sendJobChangeAlert(changeInfo) {
   }
 
   if (recipients.length === 0) {
-    console.warn('[EmailService] No email recipients configured');
-    return { success: false, error: 'No recipients configured' };
+    const msg = personRecipients?.length
+      ? 'No valid email addresses for this contact (check format).'
+      : 'No recipients configured for this contact, and no EMAIL_RECIPIENTS fallback set.';
+    console.warn('[EmailService]', msg);
+    return { success: false, error: msg };
   }
 
   // Build email content
@@ -86,8 +89,9 @@ async function sendJobChangeAlert(changeInfo) {
 
   try {
     // Send emails using Resend batch API
+    const from = process.env.EMAIL_FROM || 'JobCheck <onboarding@resend.dev>';
     const emailPromises = recipients.map(recipient => ({
-      from: process.env.EMAIL_FROM || 'JobCheck <alerts@jobcheck.app>',
+      from,
       to: recipient,
       subject,
       html: htmlContent,
